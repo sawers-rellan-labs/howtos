@@ -1,0 +1,52 @@
+---
+title: "plot_geolocated_points_in_map"
+author: "Rubén Rellán Álvarez"
+date: "July 8, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+```{r}
+library(tidyr)
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(magrittr)
+library(rmarkdown)
+library(cowplot)
+library(ggmap)
+library(maps)
+```
+
+## Plotting geolocated points into a map using `ggmap`
+
+
+```{r}
+#load sample data
+
+andosol <- read.csv("data/andosol.csv")
+
+#create variables from data 
+
+longitude <- andosol$Long
+latitude <- andosol$Lat
+id <- andosol$ID
+
+#create basemap using get_map function
+#see more detailed info about get_map here: http://www.r-bloggers.com/gps-basemaps-in-r-using-get_map/
+# play with different levels of zoom and maptypes.
+
+basemap <- get_map(location='Guanajuato, Mexico', zoom = 5, maptype = "satellite", color='bw', source='google')
+ggmap(basemap)
+
+#save the base layer map. Notice that I am adding a 
+
+map <- ggmap(basemap, extent='panel', base_layer=ggplot(andosol, aes(x=longitude, y=latitude)))
+
+#add points
+
+map + geom_point(aes(colour = P_retention)) + 
+  ggsave("map_races_p_retention.png", height = 12, width = 12, units = "cm")
+```
+
+

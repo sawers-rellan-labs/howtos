@@ -1,0 +1,31 @@
+ ID,Collnumb,Race,Long,Lat,Elevation,Soil_type,P_retention,secondary_soil
+CIMMYTMA-018840,CHIS318,Tuxpeno,-92.16,14.93,301,Andosol,high,NA
+CIMMYTMA-030005,CHIS1055,Oloton,-92.7,16.87,1874,Andosol,high,Acrisol
+CIMMYTMA-005578,MICH316,Celaya,-101.47,19.33,2233,Andosol,high,Acrisol
+CIMMYTMA-005626,VERA306,Arrocillo Amarillo,-97.2,19.51,3017,Andosol,high,Andosol
+CIMMYTMA-010234,PUEB 552,Cacahuacintle,-97.38,19,2600,Andosol,high,Andosol
+CIMMYTMA-001456,MICH195,Chalqueno,-101.92,19.67,2430,Andosol,high,Andosol
+CIMMYTMA-005582,MICH320,Conico,-101.56,19.42,2483,Andosol,high,Feozem
+CIMMYTMA-001374,MEXI210,Palomero Toluqueno,-99.4,18.97,2445,Andosol,high,Litosol
+CIMMYTMA-013353,MICH230,Vandeno,-102.06,19.47,1902,Andosol,high,Regosol
+CIMMYTMA-025041,CHIS533,Olotillo,-93.72,16.7,547,Cambisol,low,Cambisol
+CIMMYTMA-001671,NAYA39,Reventador,-105.28,21.95,10,Cambisol,low,Fluvisol
+CIMMYTMA-018888,NAYA70,Tabloncillo,-105.46,22.42,11,Cambisol,low,Fluvisol
+CIMMYTMA-000547,QUER50,Tuxpeno,-99.63,21.45,562,Cambisol,low,Luvisol
+CIMMYTMA-000743,CHIS 26,Tepecintle,-92.9,15.43,107,Cambisol,low,Regosol
+CIMMYTMA-000449,COAH64,Tuxpeno,-100.73,28.27,356,Castanozem,moderate,Rendzina
+CIMMYTMA-000309,JALI43,Tabloncillo,-104.27,19.97,1355,Feozem,low,Cambisol
+CIMMYTMA-000554,GUAN4,Celaya,-101.25,21.02,2064,Feozem,low,Feozem
+CIMMYTMA-007937,CHIH140,Gordo,-108.25,29.65,2141,Feozem,low,Feozem
+CIMMYTMA-023628,SNLP143,Conico,-100,21.93,994,Feozem,low,Feozem
+CIMMYTMA-020752,HIDA184,Conico,-98.87,21.06,436,Feozem,low,Litosol
+CIMMYTMA-002233,MEXI5,Palomero Toluqueno,-99.57,19.29,2597,Feozem,low,Vertisol
+CIMMYTMA-019483,ZACA134,Conico Norteno,-103.48,22.9,2019,Feozem,low,Xerosol
+CIMMYTMA-020218,OAXA724,Bolita,-96.27,16.9,2164,Luvisol,low,Litosol
+CIMMYTMA-000815,YUCA7,Nal Tel,-88.52,20.85,30,Luvisol,low,Litosol
+CIMMYTMA-002345,VERA118,Tuxpeno,-96.71,19.86,372,Luvisol,low,Luvisol
+CIMMYTMA-010438,CHIS684,Oloton,-92.46,16.71,1962,Luvisol,low,Luvisol
+CIMMYTMA-027102,AGUC67,Conico Norteno,-102.13,21.92,2042,Planosol,low,Xerosol
+CIMMYTMA-002246,NAYA6,Jala,-104.45,21.11,1098,Regosol,low,Feozem
+CIMMYTMA-007344,SONO169,Onaveno,-110.37,29.44,390,Xerosol,moderate,NA
+CIMMYTMA-013374,DURA33,Conico Norteno,-104.12,24.47,2030,Xerosol,moderate,Vertisol
