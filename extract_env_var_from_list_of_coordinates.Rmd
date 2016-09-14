@@ -1,0 +1,137 @@
+---
+title: "extracting_env_variables_from_list_of_coordinates"
+author: "Rubén Rellán Álvarez"
+date: "September 14, 2016"
+output: html_document
+---
+
+With this script we can extract environmental variables contained in geotiff files for a list of latitude-longitude pairs. Usually this represents the place where a certain accesion was collected.
+
+There are two basic things we need to do this.
+
+- a file containing a list of accessions with their corresponding Latitude and Longitude values. - geotiff files containing the environmental information. geottif files are just tiffs where the length and width match latitude and longitude values and the intensity of the pixels is the value of the environmental variable of interest. You can obtain geotiffs from a variety of sources. 
+For climatic data http://www.worldclim.org/ is a great place. Data can be dowloaded for specfic tiles here http://www.worldclim.org/tiles.php
+https://www.soilgrids.org/ is a great place for soil data. You can dowload specific soil types for the whole world. 
+Their ftp server is great way to start: ftp://ftp.soilgrids.org/data/
+
+Most of the code here was taken from this phenomenal gist:
+https://gist.github.com/kgturner/6643334
+
+Let´s get started then loading the required packages. Install them first if you haven´t done alreay. 
+
+
+
+```{r setup, include=FALSE}
+library(raster)
+library(sp)
+library(rgdal)
+library(foreach)
+library(dplyr)
+library(ggplot2)
+library(viridis) # just for plotting aesthetics
+library(cowplot) # just for plotting aesthetics
+```
+
+We will be using a set of accessions from Michoacan and a geotiff map representing the probability of a certain coordinate to be an andosol.
+
+```{r}
+# Read names of all geotiff files in directory into a list. In our case there is only one file but it would be the same if there were multiple files. 
+#from http://stackoverflow.com/questions/5319839/read-multiple-csv-files-into-separate-data-frames
+filenames <- list.files(path="data/geotiffs/")
+
+#Load all geoTIFF files, note that in the repo, this folder is empty. You need to add your own file.
+for(i in filenames){
+filepath <- file.path("data/geotiffs",i)
+assign(i, raster(filepath))
+}
+
+#check that all files loaded properly by raster
+#from http://stackoverflow.com/questions/15387727/use-object-names-as-list-names-in-r
+
+```
+
+Now we need to load the file containing the list of accessions with their corresponding coordinates.
+
+Since we need a file with three columns Latitude, Longitude and population or accession we do a bit of cleaning up first.
+
+```{r}
+andosol <- read.csv("data/full_andosol.csv")
+
+pop <- andosol %>%
+	select(Latitude, Longitude, ID) %>%
+	rename(Pop = ID)
+
+row.names(pop) <- pop$Pop
+head(pop)
+
+
+#load location coordinates as SpatialPoints
+for(i in pop$Pop){
+assign(i,SpatialPoints(as.matrix(t(c(pop[i,2], pop[i,1])))))
+}
+
+#check that SpatialPoints load correctly from geoTIFFs
+poplist <- mget(levels(pop$Pop), envir=globalenv())
+ 
+tiffvector <- unlist(list)
+
+#make climate data table
+env<- foreach(p=poplist, .combine='rbind') %:%
+foreach(t=tiffvector, .combine='cbind') %do%{
+myValue<-extract(t, p)
+} 
+
+# this will take a while if the datasets are big
+
+# we then do a tidy table
+popnames <- sort(as.character(pop$Pop))
+env <- as.data.frame(env, row.names=popnames)
+colnames(env) <- filenames
+
+#write table
+write.csv(env, file="env_andosol.csv")
+
+#load file
+
+env <- read.csv("env_andosol.csv")
+
+#some more tidying
+
+env <- env %>%
+	rename(ID = X) %>%
+	rename(andosol = andosols.tif) 
+
+#finally we combine this file with the original one
+
+andosol_complete <- env %>%
+	inner_join(andosol, by = "ID") 
+
+# and we write down to a file
+write.csv(andosol_complete, file="andosol_env.csv")
+
+```
+
+Using `raster`we can directly plot the geotiff
+
+
+```{r}
+andosols <- raster("data/geotiffs/andosols.tif") 
+
+plot(andosols)
+```
+
+But maybe more interesting is of course to plot values of our environmental variable for our georeferenced accessions.
+
+This is the simplest way to do this:
+
+```{r}
+andosol_complete %>%
+	ggplot(aes(x = Longitude, y = Latitude, color = andosol)) +
+	geom_point() +
+	scale_color_viridis()
+	
+```
+
+
+
+
