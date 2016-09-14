@@ -43,3 +43,27 @@ pc_pathway_exp %>%
 
 ```
 
+
+lipids <- read_csv("data/lipid.csv") # it can be dowloaded from Plant Metabolic Network
+
+# subset list of PC pathway genes
+
+lipid_exp <- tissue_exp %>%
+  inner_join(lipids) %>% # and now we transform the dataset 
+  gather(tissue, expression_value, -gene, -chromosome, -position_left, -position_right) # we could generate more grouping variables like root types etc.
+
+```
+
+Data is now ready to start plotting.
+
+```{r}
+pc_pathway_exp %>%
+  filter(Maize_AGPv2_gene == "GRMZM2G170400") %>% # GO XPT1B!!
+  filter(expression_value > 250) %>% # to reduce the number of tissues plotted
+  ggplot(aes(x = reorder(tissue,expression_value), y = expression_value)) +
+  geom_point() +
+  coord_flip() 
+
+```
+
+
