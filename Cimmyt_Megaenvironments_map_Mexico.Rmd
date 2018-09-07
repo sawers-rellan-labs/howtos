@@ -1,0 +1,154 @@
+---
+title: "CIMMYT_megaenvironment_map_mexico"
+author: "Sergio Pérez-Limón"
+date: "7 de septiembre de 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Packages calling
+
+For this exercise, we'll going to use the next packages:
+
+- tidiverse <- For data filtering and arrangement and the plotting of the map
+- rgdal <- for the map information reading
+- rgeos <- map information reading
+- broom <- it will help us to transform the information in the map format to a tidy
+
+```{package_loading}
+
+library(rgdal)
+library(rgeos)
+library(tidyverse)
+library(broom)
+
+````
+
+CIMMYT Data uploading
+
+We have acces to the Mega-environment data from CIMMYT in the next URL:
+https://data.cimmyt.org/dataset.xhtml?persistentId=hdl:11529/10624
+
+Download the file Maize_mega_environments.zip and extract all the files in your wd
+
+The pipeline is the next:
+
+- Import the map (.shp) file: R is going to import it as a LSPD type (Large Spatial Poligon Dataframe)
+- Transform LPSD it to a tidy dataframe with < tidy > function in broom package.
+- Filter the coordinates (lat, long) of the place we want to put in the map (Mexico in this case)
+- Looking for the basemap of the place we want to put in the map (Mexico, in this case)
+- In this case, hide residual information of CIMMYT (using Belize, Honduras and Guatemala in this case) <- Improovement oportunity
+- Plot maps with ggplot2
+- Edit plot
+- Be happy
+
+````{mega_environment_data}
+
+#importing SHAPEFILE map 
+area <- readOGR(dsn = "D:/Masters/RS Lab/Heterosis Project/Maize_mega_environments", layer = "maize_merged")
+area@data$id <- rownames(area@data)
+
+# transforming SHAPEFILE to a tidy data frame
+area.points <- broom::tidy(area)
+
+# Final Data Frame
+area.df = plyr::join(area.points, area@data, by="id") # 
+
+````
+
+Filtar  coordenadas (lat, long) para México
+
+Las coordenadas son aproximadamente:
+
+Lat: 14.5 - 40
+Long: -85 - -125
+
+````{Filtering_coordinates_Mexico}
+
+area.Mexico <- area.df %>%
+  filter(between(long, -125, -85)) %>%
+  filter(between(lat, 14.5, 40))
+
+````
+
+Importing Mexico and South America Map
+
+I'm importing base map for Mexico with statal divition. 
+
+All maps are obtained from: https://gadm.org/download_country_v3.html. Download the R (sp) file and move it to your wd
+
+Note: For statal divition select level 1 map (only for Mexico in this case), otherwise, select level 0.
+
+We apply the same pipeline: we import the data as a 
+
+````{Mexico_and_SA}
+
+mapamex <- readRDS("D:/Masters/RS Lab/Heterosis Project/gadm36_MEX_1_sp.rds")
+mapamex_df <- tidy(mapamex)
+Guatemala <- readRDS("D:/Masters/RS Lab/Heterosis Project/gadm36_GTM_0_sp.rds")
+Guatemala_df <- tidy(Guatemala)
+Guatemala_df <- Guatemala_df %>%
+  filter(lat > 14.5)
+Belize <- readRDS("D:/Masters/RS Lab/Heterosis Project/gadm36_BLZ_0_sp.rds")
+Belize_df <- tidy(Belize)
+Honduras <- readRDS("D:/Masters/RS Lab/Heterosis Project/gadm36_HND_0_sp.rds")
+Honduras_df <- tidy(Honduras)
+Honduras_df <- Honduras_df %>%
+  filter(lat > 14.5)
+````
+
+Plotting the data
+
+In this case I'm using ggplot because it's awesome. 
+
+First, we are going to plot the CIMMYTs information
+
+ggplot(area.Mexico) +
+  aes(long,lat,group=group, fill = NAME) + 
+  geom_polygon() +
+
+This chunk of code generate the aesthetics and plots the CIMMYTs information, with < fill = NAME > we group the Mega-environments and assign a color scale to each one of them (it can be changed, but I'm using the default one)  
+  geom_polygon(data = mapamex_df, aes(x = long, y = lat, group = group), fill = NA, color = "black") +
+  geom_polygon(data = Guatemala_df, aes(x = long, y = lat, group = group), fill = "white", color = "black") +
+  geom_polygon(data = Belize_df, aes(x = long, y = lat, group = group), fill = "white", color = "black") +
+  geom_polygon(data = Honduras_df, aes(x = long, y = lat, group = group), fill = "white", color = "black") +
+  
+The chunk above plots the basemap for Mexico with its state divition (level 1) and Belize, Guatemala and Honduras map (level 0). Mexico has a transparent background (otherwise, it would cover the CIMMYTs information ) and the state lines in black <fill = NA>, while Guatemala, Belize and Honduras have a white background < fill = "white">
+
+  theme_classic() +
+
+theme_classic() generates a general white background
+
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank(),) +
+
+Code for eliminating x and y margins and text
+
+  ggtitle("CIMMYT maize mega-environments in Mexico")
+  
+Title of the plot
+````{Plotting_final_map}
+
+ggplot(area.Mexico) +
+  aes(long,lat,group=group, fill = NAME) + 
+  geom_polygon() +
+  geom_polygon(data = mapamex_df, aes(x = long, y = lat, group = group), fill = NA, color = "black") +
+  geom_polygon(data = Guatemala_df, aes(x = long, y = lat, group = group), fill = "white", color = "black") +
+  geom_polygon(data = Belize_df, aes(x = long, y = lat, group = group), fill = "white", color = "black") +
+  geom_polygon(data = Honduras_df, aes(x = long, y = lat, group = group), fill = "white", color = "black") +
+  theme_classic() +
+  theme(axis.line=element_blank(),
+        axis.text.x=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks=element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank(),) +
+  ggtitle("CIMMYT maize mega-environments in Mexico")
+
+````
